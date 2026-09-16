@@ -1,0 +1,38 @@
+curl -X POST "https://generativelanguage.googleapis.com/v1beta/interactions" \
+  -H "Content-Type: application/json" \
+  -H "x-goog-api-key: [REDACTED]" \
+  -H "x-server-timeout: 30000" \
+  -H "Api-Revision: 2026-05-20" \
+  -d '{
+  "input": "placeholder",
+  "environment": {
+    "type": "remote",
+    "sources": [
+      {
+        "type": "inline",
+        "target": "/.agents/AGENTS.md",
+        "content": "# Research Agent\n\nYou are a careful research agent. Prefer primary sources and structured APIs over random web browsing.\n\n## Operating principles\n- Start from the skills under `.agents/skills/` when the task matches.\n- Prefer curl/API calls with clear User-Agent headers over browser automation.\n- Always cite sources with URLs and retrieval timestamps (UTC).\n- Write artifacts to `/workspace/out/` (...[truncated, 1035 chars total]"
+      },
+      {
+        "type": "inline",
+        "target": "/.agents/skills/research-brief/SKILL.md",
+        "content": "---\nname: research-brief\ndescription: Use when the user wants a research brief, literature scan, company/filing dig, or daily digest synthesis. Orchestrates OpenAlex, EDGAR, and web-source triage into one cited markdown brief.\n---\n\n# Research brief\n\n## When to use\nAny open-ended research ask that should end in a short cited brief (not raw dumps).\n\n## Steps\n1. Restate the question in one sentence a...[truncated, 1195 chars total]"
+      },
+      {
+        "type": "inline",
+        "target": "/.agents/skills/edgar-filings/SKILL.md",
+        "content": "---\nname: edgar-filings\ndescription: Use when researching US public-company SEC filings (10-K, 10-Q, 8-K). Uses SEC EDGAR data.sec.gov APIs with a proper User-Agent.\n---\n\n# EDGAR filings research\n\n## Rules\n- SEC requires a descriptive User-Agent: `ResearchAgent/0.1 (ivanleomk@gmail.com)`\n- Be polite: \u226410 requests/second; prefer fewer.\n- Do not scrape HTML indexes when JSON APIs exist.\n\n## Workflow...[truncated, 1283 chars total]"
+      }
+    ]
+  },
+  "agent": "antigravity-preview-05-2026",
+  "tools": [
+    {
+      "type": "code_execution"
+    },
+    {
+      "type": "google_search"
+    }
+  ],
+  "stream": true
+}'
