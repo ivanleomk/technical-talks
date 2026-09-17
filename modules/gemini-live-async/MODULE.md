@@ -3,6 +3,7 @@ id: gemini-live-async
 title: Gemini 3.8 Live — async function calling
 tags: [live-api, voice, async-tools]
 duration_min: 5–8
+status: inventory (not delivered 2026-09-16 — Live async FC did not land as a distinct beat)
 ---
 
 # Gemini 3.8 Live + async function calling

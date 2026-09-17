@@ -3,6 +3,7 @@ id: gemini-api-cli
 title: gemini-api CLI (Philipp / Google)
 tags: [cli, scaffold, agents-init]
 duration_min: 3–5
+status: inventory (not delivered 2026-09-16 — validated and ready as an alternate ship path)
 ---
 
 # Gemini API CLI lifecycle

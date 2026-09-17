@@ -3,6 +3,7 @@ id: pricing-live
 title: Live pricing vs others
 tags: [pricing, openai, anthropic]
 duration_min: 2–3
+status: inventory (not delivered 2026-09-16 — Live pricing wasn't a beat; talk cited Interactions caching economics instead)
 ---
 
 # Gemini 3.8 Live pricing (supporting slide)
