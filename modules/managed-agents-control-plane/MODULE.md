@@ -1,10 +1,10 @@
 ---
 id: managed-agents-control-plane
-title: Managed Agents control plane (GrokBot-shaped, CF DO)
+title: Managed Agents control plane (single DO, easy config)
 tags: [cloudflare, durable-objects, managed-agents, interactions, hermes]
 duration_min: 8–12
 ---
 
 # Managed Agents control plane
 
-Product spine: Hermes-like CLI + channel gateways → one Durable Object per conversation (SQLite) → Gemini Interactions / Managed Agents. Less steering; agent recovers when sandboxes die.
+One Durable Object + SQLite for all conversations; Interactions hold history. Gemini 3.8 / Managed Agents orchestrate. v0 = Telegram + config; v1 = multi-bot / multi-channel / routines.

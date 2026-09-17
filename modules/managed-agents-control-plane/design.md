@@ -1,114 +1,113 @@
 # Design: Managed Agents messaging control plane
 
-Status: sketch (17 Sep 2026)  
-Owner intent: GrokBot-like multi-bot UX, but **Managed Agents own the runs**; Cloudflare owns inbox + lifecycle.
+Status: sketch (17 Sep 2026) — revised same day  
+Intent: GrokBot-like multi-bot UX; **Managed Agents + Gemini 3.8** own reasoning; Cloudflare is a thin, configurable control plane.
 
-## Problem
-GrokBot-style assistants need: many chats in flight, Telegram/WA/app messages while a model is busy, routines, leaf bots (expense tracker + custom MCPs). Steering every step in a desktop agent is heavy. Managed Agents already give sandbox + skills; we need a **control plane** that:
-1. Normalizes inbound channels
-2. Tracks turn-in-flight vs new interaction
-3. Survives environment death without dumping recovery on the user
+## Pivot (vs earlier draft)
+- **Earlier:** one Durable Object *per conversation*.
+- **Now:** **one Durable Object** (per user / per deploy) that handles **all** conversations.
+- Why: Gemini Interactions already gives **server-side history** via `previous_interaction_id` (+ optional `environment_id` for sandboxes). The DO does not need to be the chat log — it needs to be the **orchestrator state machine**: which chats exist, what’s in-flight, pending inbox, channel config, routines.
 
-## Shape
+For fitness / expenses / email “keep me updated” bots, a strong orchestrator model (3.8 Flash / Live / Managed Agent) doing the work beats a fleet of thin DOs.
+
+## Architecture
 
 ```
-Telegram / WA / in-app
-        │
-        ▼
-  Gateway Worker (normalize → Event)
-        │
-        ▼
-  Durable Object (one per conversation)
-        │  SQLite: inbox, runs, env, pending
-        ▼
-  Gemini Interactions API
-  (agent=…, background=true, previous_interaction_id, environment)
+Telegram / WA / in-app / email hooks
+              │
+              ▼
+     Gateway Worker (normalize Event)
+              │
+              ▼
+     Single Durable Object + SQLite
+     (config, conversations index, runs,
+      pending inbox, routines)
+              │
+              ▼
+     Interactions / Managed Agents
+     (history on Google; env for sandbox)
 ```
 
-### Why one Durable Object (per conversation)
-- **SQLite in the DO** is the source of truth for that chat: pending user messages, current run, history of `interaction_id` / `environment_id`.
-- Single-threaded DO = natural lock: “is a turn in flight?” before dispatching a new `interactions.create`.
-- No distributed race across five Workers guessing whether to start or append.
-- Sub-agents / leaf bots can be **rows or child run records** in the same DO (or a second DO keyed by `bot_id:conversation_id` if isolation is needed later). Start with one DO per user-facing conversation.
+### What lives where
+| Concern | Where |
+|---------|--------|
+| Message history / model memory | `previous_interaction_id` (Interactions store) |
+| Sandbox files / packages | `environment_id` (persist; recover on death) |
+| Turn-in-flight, pending msgs, notify | **DO SQLite** |
+| Channel tokens, MCP allowlists, bot persona | **DO SQLite** (or Secrets Store + DO pointers) |
+| Heavy reasoning / tools | Gemini 3.8 + Managed Agent skills/MCPs |
 
-### Run record (minimum columns)
-| Field | Why |
-|-------|-----|
-| `conversation_id` | DO key / FK |
-| `interaction_id` | Chain with `previous_interaction_id` |
-| `environment_id` | Reattach sandbox; detect death |
-| `status` | `queued` / `in_progress` / `requires_action` / `completed` / `failed` / `cancelled` |
-| `started_at` / `ended_at` | Notify “done” |
-| `last_error` | Environment gone, 400 chain, etc. |
+### SQLite sketch (single DO)
+- `conversations(id, channel, external_thread_id, last_interaction_id, last_environment_id, status, …)`
+- `pending_messages(id, conversation_id, payload, created_at, delivered_at)`
+- `runs(id, conversation_id, interaction_id, environment_id, status, …)`
+- `bots` / `config` (persona, MCPs, notify prefs) — **easy config**
+- `routines` (cron-like metadata; CF Cron pokes the DO)
 
-**Always persist both `interaction_id` and `environment_id`.** Interaction alone is conversation history; environment is files + packages. Environments idle (~15m) and delete after inactivity — failures will happen.
+Turn rule stays: if that conversation’s run is `in_progress`, enqueue pending; else create/chain interaction. Multiple conversations can be in flight as **rows**, serialized through one DO (alarm/queue if fan-out gets hot).
 
-### Turn-in-flight rule
-On inbound event:
-1. Insert into `pending_messages`.
-2. If `status == in_progress` → **do not** create a new interaction; wait for completion (or `requires_action`).
-3. If idle → create interaction with `previous_interaction_id` (if any) + `environment` = last good `environment_id` **or** `"remote"` if env is dead.
-4. On completion → notify channel (“done”); drain pending into next turn (coalesce).
+### Pending read gate
+Still: tool or injected follow-up `read_pending_user_messages` so mid-run Telegram doesn’t vanish. Control plane owns the inbox; model only reads via that API.
 
-### Forced read-before-finish (makeshift hook)
-Control plane owns the inbox. Expose a tool the Managed Agent **must** call (or the plane injects as next input):
+### Environment death
+Persist `environment_id`. On failure → new remote env + short agent note (“sandbox reset, recover what you need”) — agent-led, not user-led.
 
-`read_pending_user_messages` → returns all unread rows since run start, marks them delivered.
+---
 
-Gate: do not treat the run as user-complete until pending is empty **or** the agent explicitly acknowledged them this turn. That way mid-run Telegram noise isn’t lost and isn’t a second parallel brain.
+## v0 — shippable spine (easy config)
 
-### Environment death → agent-led recovery (not user-led)
-When follow-up with `environment=<old_id>` fails (gone / expired):
-1. Mark env dead in SQLite.
-2. Start a **new** remote environment; keep `previous_interaction_id` if history still matters, or start fresh with a system note.
-3. Inject a short system/user message to the agent: sandbox was reset, files lost; recover what you can from cited URLs / prior brief / skills; don’t ask the human to rebuild the workspace by hand.
-4. Notify user lightly only if user-visible work was lost (“agent is redoing X after a sandbox reset”).
+**Goal:** one configurable bot, one channel, orchestrator does the job.
 
-90% of recovery = prompt + skills + APIs; 10% = surface blocker (auth, quota).
+1. **Single DO + SQLite** with conversations + runs + pending.
+2. **CLI / config file** (Hermes-ish):
+   - `bot.name`, `bot.system` / skills mount
+   - `channel: telegram` + token
+   - `model` / `agent` (e.g. Managed Agent or `gemini-3.8-flash`)
+3. Telegram webhook → Worker → DO → `interactions.create` (`background=true`).
+4. Persist `interaction_id` + `environment_id`; on complete → Telegram “done” (+ short summary).
+5. Pending coalesce + forced read tool.
+6. One example leaf skill: **expense log** or **fitness weigh-in** (skill markdown + optional MCP stub) — prove “configure, don’t code a new product.”
 
-### Channel gateway (Hermes-ish)
-CLI: `connect telegram` → store bot token in secrets → webhook URL on Worker.  
-Normalize to:
+**Non-goals for v0:** multi-channel fan-in, multi-bot roster UI, fancy routines UI, per-conversation DO sharding.
 
-```json
-{ "conversation_id", "channel", "user_id", "text", "media", "ts", "raw_id" }
+**Config shape (illustrative):**
+```yaml
+bot:
+  id: cos-lite
+  agent: antigravity-preview-09-2026   # or model: gemini-3.8-flash
+  skills: [expense-log]                 # mount from repo / inline
+channels:
+  telegram:
+    token_secret: TELEGRAM_BOT_TOKEN
+notify:
+  on_complete: true
 ```
 
-Same schema for WhatsApp / in-app. Unified “RockBot/GrokBot-shaped” event bus.
+---
 
-### Leaf bots / MCPs
-Main conversation DO dispatches leaf runs (expense tracker) as Managed Agents with custom MCP allowlists + network transforms. Config lives in SQLite or a small config DO; secrets never in sandbox plaintext.
+## v1 — multi-bot / multi-channel / routines
 
-### Cloudflare pieces
-| Piece | Role |
-|-------|------|
-| Worker | Webhooks, CLI API, notify out |
-| DO + SQLite | Per-conversation state machine |
-| Queues (optional) | Burst coalesce, completion fan-in |
-| Cron Triggers | Routines (digest, sync) |
-| Secrets Store | Channel tokens, `GEMINI_API_KEY` |
+1. Same DO; many `bots` rows; route by chat ↔ bot binding.
+2. Channels: Telegram + WhatsApp + in-app gateway (normalized Event).
+3. Routines: CF Cron → DO → “wake conversation X with prompt Y.”
+4. Custom MCP registry per bot (expense, Gmail read-only, etc.) + network allowlists.
+5. Main orchestrator bot that **dispatches** leaf Managed Agents (still one DO tracking child `run` rows).
+6. Better recovery UX + optional env snapshot download when critical.
+7. Scale escape hatch: if single DO throughput hurts, **shard DO by user_id** (still not per conversation unless measured need).
 
-Managed Agent **compute** stays on Google; CF is control + messaging.
+---
 
-## Non-goals (v0)
-- Replacing Antigravity IDE UX
-- Perfect multi-writer sync across devices
-- Auto-send on third-party chats without explicit policy
-
-## v0 milestone
-1. One DO + SQLite schema above  
-2. Telegram in → Managed Agent out → Telegram “done”  
-3. Pending-message tool + coalesce  
-4. Persist `environment_id`; simulated env death → agent recovery message  
-5. CLI `connect telegram` stub  
-
-Expense tracker MCP = first leaf after the spine works.
+## Why this is easier to build on
+- Interactions = free conversation store; DO stays small.
+- 3.8 as orchestrator collapses “fitness / money / email” into config + skills, not new services.
+- v0 is one YAML + one DO + one webhook — demoable for talks and personal use.
+- v1 adds roster/routines without rewriting the run machine.
 
 ## Open questions
-- One DO per conversation vs one DO per user (multi-chat in one SQLite)?
-- Completion: poll Interactions vs client reconnect / alarm in DO?
-- When to drop `previous_interaction_id` after env death (history vs clean slate)?
+- Serialize all conversations through one DO alarm loop vs parallel `fetch` from DO to Interactions (DO still authoritative for locks)?
+- Default after env death: keep `previous_interaction_id` or cold start + summary row in SQLite?
+- Config UX: CLI only for v0, or also a tiny web settings page?
 
 ## Related
-- Repo demos: `ivanleomk/managed-research-agent`  
+- `ivanleomk/managed-research-agent` (skills demo)
 - Talk modules: `interactions-api`, `managed-agents`, `gemini-api-cli`
