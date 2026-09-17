@@ -23,6 +23,8 @@ print(input_items)
 
 interaction = client.interactions.create(model=MODEL, input=input_items)
 print(interaction.output_text)
+print({"total_tokens": interaction.usage.total_tokens})
+
 # Output:
 # [{'type': 'video', 'uri': 'https://youtu.be/...', 'processing': 'agentic'}, ...]
 # Interaction(..., steps=[ProcessingCallStep(...), ProcessingResultStep(...), ...])

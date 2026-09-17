@@ -1,0 +1,35 @@
+---
+title: Multimodal function calling
+---
+
+<h1 className="wide-title">
+  Multimodal tools, via <span className="em">base64</span>
+</h1>
+
+<div className="concept-grid">
+  <div>
+    <span className="label">Schema limitations</span>
+    <p className="concept-copy">
+      FunctionResponse only accepts a JSON dict — no native image part.
+      Returning an image from a tool means base64-encoding it into a string
+      field, then hunting through parts by hand for the function call.
+    </p>
+  </div>
+  <div className="concept-code">
+    <span className="concept-file">1_legacy_generate_content/04_multimodal_fc.py</span>
+
+```python
+# Hunt through the parts by hand
+fc = next(
+    part.function_call
+    for part in res1.candidates[0].content.parts
+    if part.function_call
+)
+
+# FunctionResponse only accepts a JSON dict — no image part
+image_b64 = base64.b64encode(img_path.read_bytes()).decode()
+tool_result = {"text": f"path is {img_path}", "image": image_b64}
+```
+
+  </div>
+</div>

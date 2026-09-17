@@ -1,0 +1,35 @@
+---
+title: The history trap
+---
+
+<h1 className="wide-title">
+  Every turn, <span className="em">re-send</span> everything
+</h1>
+
+<div className="concept-grid">
+  <div>
+    <span className="label">Stateless</span>
+    <p className="concept-copy">
+      generate_content forgets everything. Every turn you re-serialize the
+      whole conversation — including opaque thought_signature bytes you must
+      preserve and replay untouched.
+    </p>
+  </div>
+  <div className="concept-code">
+    <span className="concept-file">1_legacy_generate_content/01_chat_completions.py</span>
+
+```python
+history = []
+
+# Turn 1
+history.append(types.Content(role="user", parts=[types.Part.from_text(text="Hi, I am Alice.")]))
+res1 = client.models.generate_content(model="gemini-3.8-flash", contents=history)
+history.append(res1.candidates[0].content)  # thought_signature bytes and all
+
+# Turn 2: re-send every previous turn across the wire
+history.append(types.Content(role="user", parts=[types.Part.from_text(text="What is my name?")]))
+res2 = client.models.generate_content(model="gemini-3.8-flash", contents=history)
+```
+
+  </div>
+</div>

@@ -1,0 +1,34 @@
+---
+title: A managed agent
+---
+
+<h1 className="wide-title">
+  This is a <span className="em">managed agent</span>
+</h1>
+
+<div className="concept-grid">
+  <div>
+    <span className="label">Same API</span>
+    <p className="concept-copy">
+      The same interactions.create you already know — swap model for agent,
+      point at a remote environment, and Google hosts the loop. Events stream
+      back as they happen.
+    </p>
+  </div>
+  <div className="concept-code">
+    <span className="concept-file">4_managed_agent/00_quickstart.py</span>
+
+```python
+stream = client.interactions.create(
+    agent="antigravity-preview-05-2026",
+    environment="remote",
+    stream=True,
+    input="What is 2+2?",
+)
+
+for event in stream:
+    print(event)
+```
+
+  </div>
+</div>

@@ -1,0 +1,30 @@
+---
+title: An interaction
+---
+
+<h1 className="wide-title">
+  This is an <span className="em">interaction</span>
+</h1>
+
+<div className="concept-grid">
+  <div>
+    <span className="label">The object</span>
+    <p className="concept-copy">
+      Calling a model creates an interaction — one typed object with an id you
+      can chain, steps you can inspect, and output_text you can just print.
+    </p>
+  </div>
+  <div className="concept-code">
+    <span className="concept-file">2_interactions_api/01_hello_interaction.py</span>
+
+```python
+interaction = client.interactions.create(
+    model="gemini-3.8-flash",
+    input="Why do agent apps need tool calling?",
+)
+
+print(interaction.output_text)
+```
+
+  </div>
+</div>

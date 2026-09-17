@@ -1,0 +1,37 @@
+---
+title: Bring your own skills
+---
+
+<h1 className="wide-title">
+  Bring your own <span className="em">skills</span>
+</h1>
+
+<div className="concept-grid">
+  <div>
+    <span className="label">No tool server</span>
+    <p className="concept-copy">
+      The same SKILL.md that runs locally mounts straight into the remote
+      environment — your capabilities, Google's infrastructure.
+    </p>
+  </div>
+  <div className="concept-code">
+    <span className="concept-file">4_managed_agent/05_edgar_skill.py</span>
+
+```python
+stream = client.interactions.create(
+    agent="antigravity-preview-05-2026",
+    environment={
+        "type": "remote",
+        "sources": [{
+            "type": "inline",
+            "content": SKILL_FILE.read_text(),
+            "target": ".agents/skills/EdgarSkill/SKILL.md",
+        }],
+    },
+    stream=True,
+    input="What skills do you have?",
+)
+```
+
+  </div>
+</div>

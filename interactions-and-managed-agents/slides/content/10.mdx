@@ -1,0 +1,45 @@
+---
+title: Steps
+---
+
+<h1 className="wide-title">
+  Steps are the <span className="em">primitive</span>
+</h1>
+
+<div className="concept-grid">
+  <div>
+    <span className="label">Nicely typed, normalised</span>
+    <p className="concept-copy">
+      Thoughts, text, and tool calls all come back as typed steps — one
+      normalised shape for everything. That's what makes async function
+      calling, and different models and tools working together, easy.
+    </p>
+  </div>
+  <div className="concept-code">
+    <span className="concept-file">2_interactions_api/04_function_calling.py</span>
+
+```python
+interaction = client.interactions.create(
+    model="gemini-3.8-flash",
+    input="Look up the CIK for NVDA.",
+    tools=[lookup_cik],
+)
+
+interaction.steps
+# [
+#   ThoughtStep(
+#     signature='EpECCo4CA...',
+#     summary=None,
+#     type='thought',
+#   ),
+#   FunctionCallStep(
+#     arguments={'ticker': 'NVDA'},
+#     id='call_228161',
+#     name='lookup_cik',
+#     type='function_call',
+#   ),
+# ]
+```
+
+  </div>
+</div>
