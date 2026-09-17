@@ -1,0 +1,129 @@
+$ gemini-api agents list
+Name           Base Agent     Created
+──────────────  ──────────────  ────────────
+$AGENT_ID      antigravity-preview-05-2026
+agentic-researchantigravity-preview-05-2026
+ai-research    antigravity-preview-05-2026
+ais-customer-support-v1antigravity-preview-05-2026
+ais-data-analyst-v1antigravity-preview-05-2026
+ais-document-processor-v1antigravity-preview-05-2026
+ais-repo-maintainer-v1antigravity-preview-05-2026
+ais-talk-radio-v1antigravity-preview-05-2026
+army-author    antigravity-preview-05-2026
+army-dev       antigravity-preview-05-2026
+automation-bench-agentantigravity-preview-05-2026
+autonomous_engineerantigravity-preview-09-2026
+batch-analyst  antigravity-preview-05-2026
+code-reviewer  antigravity-preview-05-2026
+code-reviewer-116ae754antigravity-preview-05-2026
+code-reviewer-285674feantigravity-preview-05-2026
+code-reviewer-3586bd81antigravity-preview-05-2026
+code-reviewer-3b9e1b1cantigravity-preview-05-2026
+code-reviewer-88bcdfd5antigravity-preview-05-2026
+code-reviewer-9a4b8a13antigravity-preview-05-2026
+code-reviewer-cc5b0407antigravity-preview-05-2026
+code-reviewer-de7010a0antigravity-preview-05-2026
+code-reviewer-e036e40eantigravity-preview-05-2026
+code-reviewer-e379733eantigravity-preview-05-2026
+code-reviewer-e7a9960bantigravity-preview-05-2026
+code-reviewer-personaantigravity-preview-05-2026
+code-reviewer-persona-2antigravity-preview-05-2026
+code-reviewer-persona-3antigravity-preview-05-2026
+code-reviewer-persona-rest-2antigravity-preview-05-2026
+code-reviewer-tsantigravity-preview-05-2026
+coding-and-data-analystantigravity-preview-05-2026
+data-analyst   antigravity-preview-05-2026
+data-analyst-0dcc706cantigravity-preview-05-2026
+data-analyst-498c2b4fantigravity-preview-05-2026
+data-analyst-5e15487eantigravity-preview-05-2026
+data-analyst-92b42435antigravity-preview-05-2026
+data-analyst-abe8ae2dantigravity-preview-05-2026
+data-analyst-ae01c2c2antigravity-preview-05-2026
+data-analyst-e02232fbantigravity-preview-05-2026
+data-analyst-fcbd8e3fantigravity-preview-05-2026
+demo-test-agentantigravity-preview-05-2026
+designer-test-v1antigravity-preview-05-2026
+diamond-analystantigravity-preview-05-2026
+ecosystem-patcherantigravity-preview-05-2026
+edgar-research-agentantigravity-preview-05-2026
+eval-egms-workerantigravity-preview-05-2026
+explorer-dev   antigravity-preview-05-2026
+fibonacci-analystantigravity-preview-05-2026
+fibonacci-analyst-17063antigravity-preview-05-2026
+fibonacci-analyst-17656antigravity-preview-05-2026
+fibonacci-analyst-20647antigravity-preview-05-2026
+fibonacci-analyst-21690antigravity-preview-05-2026
+fibonacci-analyst-21781antigravity-preview-05-2026
+fibonacci-analyst-5e95092bantigravity-preview-05-2026
+fibonacci-analyst-6727antigravity-preview-05-2026
+fibonacci-analyst-6c437f20antigravity-preview-05-2026
+fibonacci-analyst-c217d92cantigravity-preview-05-2026
+fibonacci-analyst-ca0f2dccantigravity-preview-05-2026
+fibonacci-analyst-cc35f265antigravity-preview-05-2026
+fibonacci-analyst-cced9f37antigravity-preview-05-2026
+fibonacci-analyst-db65202dantigravity-preview-05-2026
+fibonacci-analyst-eca5cf90antigravity-preview-05-2026
+fibonacci-analyst-fcec5a37antigravity-preview-05-2026
+fibonacci-analyst-ff047496antigravity-preview-05-2026
+finance-skill-scoutantigravity-preview-05-2026
+financial-assistantantigravity-preview-05-2026
+forum-sentinel-v1antigravity-preview-05-2026
+gemhub-blog-writerantigravity-preview-05-2026
+gemhub-new-agentantigravity-preview-05-2026
+gemhub-new-agent-2antigravity-preview-05-2026
+gemhub-new-agent-3antigravity-preview-05-2026
+gemhub-tech-leadantigravity-preview-05-2026
+gemini-live-agentantigravity-preview-05-2026
+gemini-live-agent-v2antigravity-preview-05-2026
+gh-auto-reuse-1781807738antigravity-preview-05-2026
+gh-reviewer-1781804863antigravity-preview-05-2026
+gh-reviewer-1781806517antigravity-preview-05-2026
+gh-stream-reuse-1781848669antigravity-preview-05-2026
+gh-stream-reuse-1781848860antigravity-preview-05-2026
+gh-stream-reuse-1781851559antigravity-preview-05-2026
+gh-stream-reuse-1781851596antigravity-preview-05-2026
+github-reviewer-agentantigravity-preview-05-2026
+hyperframes    antigravity-preview-05-2026
+hyperframes-creator-agentantigravity-preview-05-2026
+hyperframes-video-agentantigravity-preview-05-2026
+hyperframes-video-generatorantigravity-preview-05-2026
+issue-planner  antigravity-preview-05-2026
+issue-resolver-25354d4eantigravity-preview-05-2026
+issue-resolver-3c280be1antigravity-preview-05-2026
+issue-resolver-69c72697antigravity-preview-05-2026
+issue-resolver-89de4da9antigravity-preview-05-2026
+issue-resolver-a12ff259antigravity-preview-05-2026
+issue-resolver-b436471fantigravity-preview-05-2026
+issue-resolver-be955adcantigravity-preview-05-2026
+life-events-devantigravity-preview-05-2026
+life-events-plannerantigravity-preview-05-2026
+life-planner   antigravity-preview-05-2026
+market_intelligence_agentantigravity-preview-09-2026
+motionsmith    antigravity-preview-05-2026
+my-custom-slides-agentantigravity-preview-05-2026
+
+$ gemini-api agents get edgar-research-agent --json (truncated)
+{
+ "id": "edgar-research-agent",
+ "base_agent": "antigravity-preview-05-2026",
+ "base_environment": {
+  "sources": [
+   {
+    "type": "inline",
+    "target": "/.agents/AGENTS.md",
+    "content": "# Research Agent\n\nYou are a careful research agent. Prefer primary sources and structured APIs over random web browsing.\n\n## Operating principles\n- Start from t...[truncated]"
+   },
+   {
+    "type": "inline",
+    "target": "/.agents/skills/research-brief/SKILL.md",
+    "content": "---\nname: research-brief\ndescription: Use when the user wants a research brief, literature scan, company/filing dig, or daily digest synthesis. Orchestrates Ope...[truncated]"
+   },
+   {
+    "type": "inline",
+    "target": "/.agents/skills/edgar-filings/SKILL.md",
+    "content": "---\nname: edgar-filings\ndescription: Use when researching US public-company SEC filings (10-K, 10-Q, 8-K). Uses SEC EDGAR data.sec.gov APIs with a proper User-A...[truncated]"
+   }
+  ],
+  "type": "remote"
+ }
+}

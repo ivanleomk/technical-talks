@@ -1,0 +1,7 @@
+id: edgar-research-agent
+base_agent: antigravity-preview-05-2026
+description: SEC EDGAR research agent scaffolded with gemini-api CLI; uses this repo's edgar-filings + research-brief skills.
+tools:
+  - type: code_execution
+  - type: google_search
+environment: remote
