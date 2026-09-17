@@ -3,6 +3,7 @@ id: partner-pitches
 title: How partners sell Live
 tags: [pipecat, langchain, livekit, vercel, agora]
 duration_min: 3–5
+status: inventory (not delivered 2026-09-16)
 ---
 
 # Partner pitches (Live stack)

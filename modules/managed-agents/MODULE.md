@@ -1,19 +1,28 @@
 ---
 id: managed-agents
-title: Managed Agents — ship the tuned thing
-tags: [managed-agents, remote, github-mount]
+title: Managed Agents — the Anti Gravity harness
+tags: [managed-agents, anti-gravity, sandbox, mcp, environments]
 duration_min: 6–8
+status: active (delivered 2026-09-16)
 ---
 
-# Managed Agents (ship)
+# Managed Agents — the Anti Gravity harness
 
-**Point:** Interactions surface + Antigravity skills; mount and launch — no re-tuning.
+**Point:** the Managed Agents API runs the same Anti Gravity harness used in the Anti Gravity app and Google Cloud — and it's the default RL training harness for Gemini, so it works well out of the box.
 
 ## Beats
-- `agent=` + `environment="remote"` + `background=True` (`snippets/05`)
-- Mount GitHub skills → EDGAR research (`06`)
-- Punchline: local skill → online daily digest
+1. **Two primitives**
+   - **Interaction ID** = model context. **Environment ID** = persistent VM sandbox.
+   - They're decoupled: send a fresh interaction into a long-lived environment.
+2. **Billing** — the sandbox is free; you pay model tokens only.
+3. **What the harness gives you**
+   - MCP servers via the MCP CLI.
+   - Clone GitHub / GCS repos into the sandbox.
+   - Inline skill injection (see `antigravity-skills` for the skills story).
+   - Credential proxying — agent uses secrets without seeing them.
+   - Automatic context compaction when the buffer overflows.
+4. **Custom agents** — `client.agents.create` gives you a named agent callable like any model.
 
 ## Artifacts
-- `../interactions-api/snippets/05`, `06`
-- Validated mount of `ivanleomk/managed-research-agent`
+- `../interactions-api/snippets/05` (remote environment hello), `06` (GitHub-mounted skills run)
+- Validated mount of `ivanleomk/managed-research-agent` (2026-09-16; agent id `antigravity-preview-05-2026` — check for newer previews before reuse)
